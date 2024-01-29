@@ -18,16 +18,6 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["admin", "user"],
-      //admin-access: crud - invoices and crud - user
-      //user-access: read-only - invoices
-    },
-    orgaisation: {
-      type: Schema.Types.ObjectId,
-      ref: ORGANISATION,
-    },
   },
   { timestamps: true }
 );

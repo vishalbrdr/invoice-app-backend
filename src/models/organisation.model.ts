@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { ADDRESS, ORGANISATION, USER } from "../constants";
+import { ADDRESS, BANK_ACC_INFO, ORGANISATION, USER } from "../constants";
 
 const organisationSchema = new Schema(
   {
@@ -17,6 +17,10 @@ const organisationSchema = new Schema(
     address: {
       type: Schema.Types.ObjectId,
       ref: ADDRESS,
+    },
+    bankAccInfo: {
+      type: Schema.Types.ObjectId,
+      ref: BANK_ACC_INFO,
     },
   },
   { timestamps: true }
