@@ -1,17 +1,24 @@
-import Joi from "joi";
+import z from "zod";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/ApiError";
-import { UPI_ID_PATTERN } from "../constants";
 
-export const bankAccInfoSchema = Joi.object({
-  accountNumber: Joi.number().required(),
-  ifsc: Joi.string().min(3).required(),
-  bankName: Joi.string().min(3).required(),
-  upiId: Joi.string().pattern(UPI_ID_PATTERN).required(),
+export const BankAccInfoSchema = z.object({
+  accountNumber: z.number(),
+  ifsc: z.string().min(3),
+  bankName: z.string().min(3),
+  upiId: z.string(),
 });
 
 export const validateAddressData = asyncHandler(async (req, _, next) => {
-  const { error } = bankAccInfoSchema.validate(req.body);
-  if (!error) next();
-  throw new ApiError(400, error.message, error.details);
+  const result = BankAccInfoSchema.safeParse(req.body);
+
+  if (result.success === false)
+    throw new ApiError(
+      400,
+      "validation error",
+      result.error.errors,
+      result.error.stack
+    );
+
+  next();
 });

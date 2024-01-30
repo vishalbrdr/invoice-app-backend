@@ -1,15 +1,23 @@
-import Joi from "joi";
+import z from "zod";
 import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/ApiError";
 
-export const userSchema = Joi.object({
-  fullName: Joi.string().min(3).max(30).required(),
-  email: Joi.string().email().required(),
-  password: Joi.string().min(8).max(32).required(),
+export const UserSchema = z.object({
+  fullName: z.string().min(3).max(30),
+  email: z.string().email(),
+  password: z.string().min(8).max(32),
 });
 
 export const validateUserSchema = asyncHandler(async (req, _, next) => {
-  const { error } = userSchema.validate(req.body);
-  if (!error) next();
-  throw new ApiError(400, error.message, error.details);
+  const result = UserSchema.safeParse(req.body);
+
+  if (result.success === false)
+    throw new ApiError(
+      400,
+      "validation error",
+      result.error.errors,
+      result.error.stack
+    );
+
+  next();
 });

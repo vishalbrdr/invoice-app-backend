@@ -1,5 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler";
+import { Organisation } from "../models/organisation.model";
 
 export const registerOrganisation = asyncHandler(async (req, res) => {
-  const {} = req.body;
+  const organisation: object = req.body;
 });

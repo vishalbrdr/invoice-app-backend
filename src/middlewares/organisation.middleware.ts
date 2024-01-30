@@ -1,20 +1,28 @@
 import { asyncHandler } from "../utils/asyncHandler";
-import Joi from "joi";
-import { userSchema } from "./user.middleware";
-import { addressSchema } from "./address.middleware";
-import { bankAccInfoSchema } from "./bankAccInfo.middleware";
+import z from "zod";
+import { UserSchema } from "./user.middleware";
+import { AddressSchema } from "./address.middleware";
+import { BankAccInfoSchema } from "./bankAccInfo.middleware";
 import { ApiError } from "../utils/ApiError";
 
-export const organisationSchema = Joi.object({
-  name: Joi.string().min(3).max(30).required(),
-  owner: userSchema.required(),
-  address: addressSchema,
-  bankAccInfo: bankAccInfoSchema,
-  gstin: Joi.string().optional(),
+export const organisationSchema = z.object({
+  name: z.string().min(3).max(30),
+  owner: UserSchema,
+  address: AddressSchema,
+  bankAccInfo: BankAccInfoSchema,
+  gstin: z.string().optional(),
 });
 
 export const validateOrganisationData = asyncHandler(async (req, _, next) => {
-  const { error } = organisationSchema.validate(req.body);
-  if (!error) next();
-  throw new ApiError(400, error.message, error.details);
+  const result = organisationSchema.safeParse(req.body);
+
+  if (result.success === false)
+    throw new ApiError(
+      400,
+      "validation error",
+      result.error.errors,
+      result.error.stack
+    );
+
+  next();
 });
