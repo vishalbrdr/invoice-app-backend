@@ -1,5 +1,11 @@
 import mongoose, { Schema } from "mongoose";
-import { CUSTOMER, INVOICE, ORGANISATION, PRODUCT } from "../constants";
+import {
+  CUSTOMER,
+  INVOICE,
+  INVOICE_STATUS_ENUM,
+  ORGANISATION,
+  PRODUCT,
+} from "../constants";
 
 export const invoiceSchema = new Schema(
   {
@@ -31,7 +37,7 @@ export const invoiceSchema = new Schema(
     },
     status: {
       type: String,
-      enum: ["DRAFT", "PENDING", "PAID"],
+      enum: INVOICE_STATUS_ENUM,
     },
     invoiceDate: {
       type: Date,

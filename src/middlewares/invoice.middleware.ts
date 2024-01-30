@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { ApiError } from "../utils/ApiError";
 import { ProductSchema } from "./product.middleware";
 import z from "zod";
+import { INVOICE_STATUS_ENUM } from "../constants";
 
 export const InvoiceSchema = z.object({
   invoiceNumber: z.string().min(3).max(30),
@@ -9,7 +10,7 @@ export const InvoiceSchema = z.object({
   customer: z.string(),
   items: z.array(ProductSchema),
   totalAmount: z.number().min(1),
-  status: z.string(),
+  status: z.enum(INVOICE_STATUS_ENUM),
   invoiceDate: z.date(),
   dueDate: z.date(),
 });

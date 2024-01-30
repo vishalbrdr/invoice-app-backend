@@ -8,3 +8,4 @@ export const ADDRESS = "Address";
 export const CUSTOMER = "Customer";
 export const PRODUCT = "Product";
 export const BANK_ACC_INFO = "BankAccInfo";
+export const INVOICE_STATUS_ENUM = ["DRAFT", "PENDING", "PAID"] as const;
