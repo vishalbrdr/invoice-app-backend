@@ -154,12 +154,9 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
         );
     }
 
-    console.log("logged");
     const decodedToken = <TokenPayload>(
       jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
     );
-
-    console.log(decodedToken);
 
     const user = await User.findById(decodedToken?._id);
 
@@ -197,11 +194,18 @@ export const changeCurrentPassword = asyncHandler(
   async (req: CustomRequest, res) => {
     const { oldPassword, newPassword } = req.body;
 
+    if (!(oldPassword && newPassword)) {
+      throw new ApiError(400, "please provide both passwords");
+    }
+
     const user = await User.findById(req.user?._id);
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
-    if (!isPasswordCorrect)
-      return res.status(400).json(new ApiError(400, "incorrect old password"));
+    if (!isPasswordCorrect) throw new ApiError(400, "incorrect old password");
+
+    if (oldPassword === newPassword) {
+      throw new ApiError(400, "new password cannot be same as old password");
+    }
 
     user.password = newPassword;
     await user.save({ validateBeforeSave: false });
@@ -221,9 +225,10 @@ export const getCurrentUser = asyncHandler(async (req: CustomRequest, res) => {
 export const updateAccountDetails = asyncHandler(
   async (req: CustomRequest, res) => {
     const { fullName, email } = req.body;
+    console.log(req.body);
 
-    if (!fullName || !email)
-      res.status(400).json(new ApiError(400, "atleast one field is required"));
+    if (!fullName && !email)
+      throw new ApiError(400, "atleast one field is required");
 
     const user = await User.findByIdAndUpdate(
       req.user?._id,

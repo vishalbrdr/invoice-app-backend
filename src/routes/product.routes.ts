@@ -11,11 +11,10 @@ const router = Router();
 
 router.route("/:orgId").get(isAuthenticated, getAllProducts);
 router
-  .route("/:orgId/create")
+  .route("/:orgId")
   .post(isAuthenticated, isAuthorised, validateProductData, addProduct);
 router
   .route("/:orgId/:productId/update")
   .put(isAuthenticated, isAuthorised, validateProductData, updateProduct);
-
 
 export default router;
