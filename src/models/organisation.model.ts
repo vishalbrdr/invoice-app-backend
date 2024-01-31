@@ -1,5 +1,11 @@
 import mongoose, { Schema } from "mongoose";
-import { ADDRESS, BANK_ACC_INFO, ORGANISATION, USER } from "../constants";
+import {
+  ADDRESS,
+  BANK_ACC_INFO,
+  ORGANISATION,
+  PRODUCT,
+  USER,
+} from "../constants";
 
 const organisationSchema = new Schema(
   {
@@ -10,6 +16,7 @@ const organisationSchema = new Schema(
     owner: {
       type: Schema.Types.ObjectId,
       ref: USER,
+      required: true,
     },
     gstin: {
       type: String,

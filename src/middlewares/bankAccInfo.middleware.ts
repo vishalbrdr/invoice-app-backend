@@ -9,7 +9,7 @@ export const BankAccInfoSchema = z.object({
   upiId: z.string(),
 });
 
-export const validateAddressData = asyncHandler(async (req, _, next) => {
+export const validateBankAccInfoData = asyncHandler(async (req, _, next) => {
   const result = BankAccInfoSchema.safeParse(req.body);
 
   if (result.success === false)

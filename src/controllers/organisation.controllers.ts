@@ -8,23 +8,9 @@ import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
 
 export const registerOrganisation = asyncHandler(async (req, res) => {
-  const { name, owner, address, bankAccInfo, gstin } = <OrganisationType>(
+  const { name, address, bankAccInfo, gstin } = <OrganisationType>(
     req.body
   );
-
-  // check if email already exists
-  const user = await User.findOne({ email: owner.email });
-  if (user)
-    return res
-      .status(400)
-      .json(
-        new ApiError(400, "", [
-          "email already registered with another organisation",
-        ])
-      );
-
-  const regUser = await User.create(owner);
-  if (!regUser) throw new ApiError(400, "");
 
   const regAddress = await Address.create(address);
   if (!regAddress)
@@ -36,7 +22,7 @@ export const registerOrganisation = asyncHandler(async (req, res) => {
 
   const organisation = await Organisation.create({
     name,
-    owner: regUser._id,
+    // owner: req._id,
     address: regAddress._id,
     bankAccInfo: regBankAccInfo._id,
     gstin,

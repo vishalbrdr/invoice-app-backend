@@ -1,7 +1,18 @@
-import mongoose, { Schema } from "mongoose";
-import { ORGANISATION, USER } from "../constants";
+import mongoose, { Schema, Document } from "mongoose";
+import { USER } from "../constants";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+
+interface IUser extends Document {
+  fullName: string;
+  email: string;
+  password: string;
+  refreshToken?: string;
+
+  isPasswordCorrect(password: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
+}
 
 const userSchema = new Schema(
   {
@@ -18,11 +29,14 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    refreshToken: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
+userSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("password")) return next();
 
   this.password = await bcrypt.hash(this.password, 10);
@@ -38,7 +52,6 @@ userSchema.methods.generateAccessToken = function () {
     {
       _id: this._id,
       email: this.email,
-      username: this.username,
       fullName: this.fullName,
     },
     process.env.ACCESS_TOKEN_SECRET,
@@ -60,4 +73,4 @@ userSchema.methods.generateRefreshToken = function () {
   );
 };
 
-export const User = mongoose.model(USER, userSchema);
+export const User = mongoose.model<IUser>(USER, userSchema);

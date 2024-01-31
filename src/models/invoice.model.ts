@@ -14,7 +14,7 @@ export const invoiceSchema = new Schema(
       required: true,
       unique: true,
     },
-    oranisation: {
+    organisation: {
       type: Schema.Types.ObjectId,
       ref: ORGANISATION,
       required: true,

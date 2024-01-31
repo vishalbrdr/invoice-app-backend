@@ -5,7 +5,10 @@ import { ApiError } from "../utils/ApiError";
 export const ProductSchema = z.object({
   name: z.string().min(3).max(30),
   unitPrice: z.number().min(1),
+  organisation: z.string(),
 });
+
+export type ProductType = z.infer<typeof ProductSchema>;
 
 export const validateProductData = asyncHandler(async (req, _, next) => {
   const result = ProductSchema.safeParse(req.body);
