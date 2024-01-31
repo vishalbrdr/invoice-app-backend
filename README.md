@@ -36,7 +36,7 @@ Welcome to the backend repository of the Invoice App. This repository contains t
 
     ```
     npm start
-    The server will start at http://localhost:3000.
+    The server will start at http://localhost:8000.
     ```
 
 
