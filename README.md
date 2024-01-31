@@ -9,6 +9,8 @@ Welcome to the backend repository of the Invoice App. This repository contains t
 - **MongoDB:** NoSQL database for storing app data.
 - **Mongoose:** MongoDB object modeling for Node.js.
 - **JWT:** JSON Web Tokens for authentication.
+- **TypeScript:** Typed superset of JavaScript for enhanced development.
+
 
 ## Installation
 
