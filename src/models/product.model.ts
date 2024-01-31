@@ -9,12 +9,13 @@ const productSchema = new Schema(
       lowerCase: true,
     },
     unitPrice: {
-      type: String,
+      type: Number,
       required: true,
     },
     organisation: {
       type: Schema.Types.ObjectId,
       ref: ORGANISATION,
+      required: true,
     },
   },
   { timestamps: true }

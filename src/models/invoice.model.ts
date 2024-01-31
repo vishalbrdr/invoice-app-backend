@@ -26,7 +26,8 @@ export const invoiceSchema = new Schema(
     items: {
       type: [
         {
-          product: { type: Schema.Types.ObjectId, ref: PRODUCT },
+          name: String,
+          unitPrice: Number,
           quantity: Number,
         },
       ],

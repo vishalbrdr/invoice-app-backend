@@ -18,8 +18,10 @@ app.use(cookieParser());
 // routes import
 import orgRouter from "./routes/organisation.routes";
 import userRoutes from "./routes/user.routes";
+import productRoutes from "./routes/product.routes";
 // routes declaration
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/org", orgRouter);
+app.use("/api/v1/products", productRoutes);
 
 export { app };

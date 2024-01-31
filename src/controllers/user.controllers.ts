@@ -4,6 +4,12 @@ import { ApiError } from "../utils/ApiError";
 import { Response, Request } from "express";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler";
+import { TokenPayload } from "../middlewares/auth.middlewares";
+import jwt from "jsonwebtoken";
+
+interface CustomRequest extends Request {
+  user: TokenPayload;
+}
 
 export const generateAccessAndRefreshTokens = async (
   userId: mongoose.Schema.Types.ObjectId
@@ -63,24 +69,12 @@ export const registerUser = asyncHandler(
   }
 );
 
-export const loginUser = asyncHandler(async (req: Request, res: Response) => {
+export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email && !password) {
     throw new ApiError(400, "username/email and password is required");
   }
-  const user = await User.aggregate([
-    {
-      $match: { email },
-    },
-    {
-      $lookup: {
-        from: "organisations",
-        localField: "_id",
-        foreignField: "owner",
-        as: "organisation",
-      },
-    },
-  ])[0];
+  const user = await User.findOne({ email });
 
   if (!user) return res.status(404).json(new ApiError(404, "user not found"));
 
@@ -119,3 +113,131 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
       )
     );
 });
+
+export const logoutUser = asyncHandler(async (req: CustomRequest, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $unset: {
+        refreshToken: 1,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
+  const cookieOptions = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions)
+    .json(new ApiResponse(200, {}, "user logged out successfully"));
+});
+
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+  try {
+    const incomingRefreshToken =
+      req.cookies.refreshToken || req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+      return res
+        .status(401)
+        .json(
+          new ApiError(401, "invalid refresh token", [
+            "refresh token is invalid",
+          ])
+        );
+    }
+
+    console.log("logged");
+    const decodedToken = <TokenPayload>(
+      jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET)
+    );
+
+    console.log(decodedToken);
+
+    const user = await User.findById(decodedToken?._id);
+
+    if (!user) throw new ApiError(401, "Invalid refresh token");
+
+    if (incomingRefreshToken !== user?.refreshToken)
+      throw new ApiError(401, "Invalid refresh token");
+
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+    };
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+      user._id
+    );
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .json(
+        new ApiResponse(
+          200,
+          { accessToken, refreshToken },
+          "Access token refreshed"
+        )
+      );
+  } catch (error) {
+    return new ApiError(401, error?.message || "invalid refreshtoken");
+  }
+});
+
+export const changeCurrentPassword = asyncHandler(
+  async (req: CustomRequest, res) => {
+    const { oldPassword, newPassword } = req.body;
+
+    const user = await User.findById(req.user?._id);
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+
+    if (!isPasswordCorrect)
+      return res.status(400).json(new ApiError(400, "incorrect old password"));
+
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "password changed successfully"));
+  }
+);
+
+export const getCurrentUser = asyncHandler(async (req: CustomRequest, res) => {
+  return res
+    .status(200)
+    .json(new ApiResponse(200, req.user, "current user fetched successfully"));
+});
+
+export const updateAccountDetails = asyncHandler(
+  async (req: CustomRequest, res) => {
+    const { fullName, email } = req.body;
+
+    if (!fullName || !email)
+      res.status(400).json(new ApiError(400, "atleast one field is required"));
+
+    const user = await User.findByIdAndUpdate(
+      req.user?._id,
+      {
+        $set: {
+          fullName,
+          email,
+        },
+      },
+      { new: true }
+    ).select("-password");
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, user, "Account info updated successfully"));
+  }
+);
