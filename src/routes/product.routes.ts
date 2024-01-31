@@ -9,7 +9,7 @@ import { validateProductData } from "../middlewares/product.middleware";
 
 const router = Router();
 
-router.route("/:orgId").get(isAuthenticated, getAllProducts);
+router.route("/:orgId").get(isAuthenticated, isAuthorised, getAllProducts);
 router
   .route("/:orgId")
   .post(isAuthenticated, isAuthorised, validateProductData, addProduct);

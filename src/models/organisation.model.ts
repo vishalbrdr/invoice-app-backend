@@ -3,7 +3,6 @@ import {
   ADDRESS,
   BANK_ACC_INFO,
   ORGANISATION,
-  PRODUCT,
   USER,
 } from "../constants";
 

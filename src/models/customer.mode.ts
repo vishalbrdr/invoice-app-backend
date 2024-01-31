@@ -1,11 +1,11 @@
 import mongoose, { Schema } from "mongoose";
-import { ADDRESS, CUSTOMER } from "../constants";
+import { ADDRESS, CUSTOMER, ORGANISATION } from "../constants";
 
 const customerSchema = new Schema(
   {
     fullName: {
       type: String,
-      unique: true,
+      required: true,
     },
     address: {
       type: Schema.Types.ObjectId,
@@ -13,6 +13,11 @@ const customerSchema = new Schema(
     },
     email: {
       type: String,
+    },
+    organisation: {
+      type: Schema.Types.ObjectId,
+      ref: ORGANISATION,
+      required: true,
     },
   },
   { timestamps: true }
