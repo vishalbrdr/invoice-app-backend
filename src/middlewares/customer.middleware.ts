@@ -10,14 +10,16 @@ export const CustomerSchema = z.object({
   address: AddressSchema,
 });
 
-export const validateCustomerSchema = asyncHandler(async (req, res, next) => {
+export type CustomerType = z.infer<typeof CustomerSchema>;
+
+export const validateCustomerSchema = asyncHandler(async (req, _, next) => {
   const { orgId } = req.params;
 
   if (!isValidObjectId(orgId)) {
     throw new ApiError(400, "invalid organisation id");
   }
 
-  const result = AddressSchema.safeParse(req.body);
+  const result = CustomerSchema.safeParse(req.body);
 
   if (result.success === false)
     throw new ApiError(

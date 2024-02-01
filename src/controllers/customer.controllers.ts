@@ -1,3 +1,5 @@
+import { CustomerType } from "../middlewares/customer.middleware";
+import { Address } from "../models/address.model";
 import { Customer } from "../models/customer.mode";
 import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -18,8 +20,19 @@ export const allCustomers = asyncHandler(async (req, res) => {
 
 export const addCustomer = asyncHandler(async (req, res) => {
   const { orgId: organisation } = req.params;
+  const { fullName, email, address } = <CustomerType>req.body;
 
-  const customer = await Customer.create({ ...req.body, organisation });
+  const savedAddress = await Address.create(address);
+
+  if (!savedAddress?._id)
+    throw new ApiError(400, "failed to save the customerAddress");
+
+  const customer = await Customer.create({
+    fullName,
+    email,
+    organisation,
+    address: savedAddress._id,
+  });
   if (!customer) throw new ApiError(400, "failed to add customer");
 
   return res.json(
@@ -29,6 +42,12 @@ export const addCustomer = asyncHandler(async (req, res) => {
 
 export const updateCustomer = asyncHandler(async (req, res) => {
   const { customerId, orgId: organisation } = req.params;
+  const { fullName, email, address } = <CustomerType>req.body;
+
+  const savedAddress = await Address.create(address);
+
+  if (!savedAddress?._id)
+    throw new ApiError(400, "failed to update the customer's Address");
 
   const updatedCustomer = await Customer.findOneAndUpdate(
     {
@@ -36,7 +55,7 @@ export const updateCustomer = asyncHandler(async (req, res) => {
       organisation,
     },
     {
-      $set: req.body,
+      $set: { fullName, email, organisation, address: savedAddress._id },
     },
     { new: true }
   );
@@ -51,16 +70,19 @@ export const updateCustomer = asyncHandler(async (req, res) => {
 
 export const deleteCustomer = asyncHandler(async (req, res) => {
   const { customerId, orgId: organisation } = req.params;
+
   const deletedCustomer = await Customer.findOneAndDelete({
     _id: customerId,
     organisation,
   });
-  
+
   if (!deletedCustomer)
     throw new ApiError(
       400,
       "failed to delete the customer or customer does not exist"
     );
+
+  await Address.findByIdAndDelete(deletedCustomer.address);
 
   return res.json(
     new ApiResponse(200, deletedCustomer, "customer deleted successfully")
