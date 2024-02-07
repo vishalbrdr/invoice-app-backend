@@ -45,3 +45,7 @@ export const registerOrganisation = asyncHandler(
     );
   }
 );
+
+export const getOrganisationData = asyncHandler(async (req, res) => {
+  
+});

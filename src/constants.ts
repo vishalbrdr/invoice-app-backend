@@ -1,5 +1,3 @@
-export const PORT = process.env.PORT || 8000;
-
 // mongoose model schema collections
 export const ORGANISATION = "Organisation";
 export const USER = "User";
