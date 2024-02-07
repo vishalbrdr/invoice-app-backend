@@ -7,7 +7,7 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { TokenPayload } from "../middlewares/auth.middlewares";
 import jwt from "jsonwebtoken";
 
-interface CustomRequest extends Request {
+interface RequestWithTokenPayload extends Request {
   user: TokenPayload;
 }
 
@@ -114,30 +114,32 @@ export const loginUser = asyncHandler(async (req, res) => {
     );
 });
 
-export const logoutUser = asyncHandler(async (req: CustomRequest, res) => {
-  await User.findByIdAndUpdate(
-    req.user._id,
-    {
-      $unset: {
-        refreshToken: 1,
+export const logoutUser = asyncHandler(
+  async (req: RequestWithTokenPayload, res) => {
+    await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        $unset: {
+          refreshToken: 1,
+        },
       },
-    },
-    {
-      new: true,
-    }
-  );
+      {
+        new: true,
+      }
+    );
 
-  const cookieOptions = {
-    httpOnly: true,
-    secure: true,
-  };
+    const cookieOptions = {
+      httpOnly: true,
+      secure: true,
+    };
 
-  return res
-    .status(200)
-    .clearCookie("accessToken", cookieOptions)
-    .clearCookie("refreshToken", cookieOptions)
-    .json(new ApiResponse(200, {}, "user logged out successfully"));
-});
+    return res
+      .status(200)
+      .clearCookie("accessToken", cookieOptions)
+      .clearCookie("refreshToken", cookieOptions)
+      .json(new ApiResponse(200, {}, "user logged out successfully"));
+  }
+);
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
   try {
@@ -191,7 +193,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
 });
 
 export const changeCurrentPassword = asyncHandler(
-  async (req: CustomRequest, res) => {
+  async (req: RequestWithTokenPayload, res) => {
     const { oldPassword, newPassword } = req.body;
 
     if (!(oldPassword && newPassword)) {
@@ -216,14 +218,18 @@ export const changeCurrentPassword = asyncHandler(
   }
 );
 
-export const getCurrentUser = asyncHandler(async (req: CustomRequest, res) => {
-  return res
-    .status(200)
-    .json(new ApiResponse(200, req.user, "current user fetched successfully"));
-});
+export const getCurrentUser = asyncHandler(
+  async (req: RequestWithTokenPayload, res) => {
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, req.user, "current user fetched successfully")
+      );
+  }
+);
 
 export const updateAccountDetails = asyncHandler(
-  async (req: CustomRequest, res) => {
+  async (req: RequestWithTokenPayload, res) => {
     const { fullName, email } = req.body;
     console.log(req.body);
 
@@ -244,5 +250,27 @@ export const updateAccountDetails = asyncHandler(
     return res
       .status(200)
       .json(new ApiResponse(200, user, "Account info updated successfully"));
+  }
+);
+
+export const getUsersOrganisations = asyncHandler(
+  async (req: RequestWithTokenPayload, res) => {
+    const userWithOrganisationsPipeLine = [
+      {
+        $match: { email: req.user.email },
+      },
+      {
+        $lookup: {
+          from: "organisations",
+          localField: "_id",
+          foreignField: "owner",
+          as: "organisations",
+        },
+      },
+      { $project: { organisations: 1 } },
+    ];
+    const usersOrganisations = await User.aggregate(
+      userWithOrganisationsPipeLine
+    );
   }
 );

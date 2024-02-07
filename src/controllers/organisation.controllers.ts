@@ -7,6 +7,7 @@ import { BankAccInfo } from "../models/bankAccInfo";
 import { ApiResponse } from "../utils/ApiResponse";
 import { TokenPayload } from "../middlewares/auth.middlewares";
 import { Request } from "express";
+import { ApiError } from "../utils/ApiError";
 
 interface CustomRequest extends Request {
   user: TokenPayload;
@@ -47,5 +48,11 @@ export const registerOrganisation = asyncHandler(
 );
 
 export const getOrganisationData = asyncHandler(async (req, res) => {
+  const organisation = await Organisation.findById(req.params.orgId);
+  if (!organisation)
+    throw new ApiError(400, "failed to fetch the organisation data");
   
+  res.json(
+    new ApiResponse(200, organisation, "organisation data fetched sucessfully")
+  );
 });
