@@ -6,7 +6,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: "http://localhost:3000",
     credentials: true,
   })
 );
@@ -37,8 +37,8 @@ import customerRoutes from "./routes/customer.routes";
 import path from "path";
 import { marked } from "marked";
 // routes declaration
-app.use("/api/v1/user", userRoutes);
-app.use("/api/v1/org", orgRouter);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/orgs", orgRouter);
 app.use("/api/v1/products", productRoutes);
 app.use("/api/v1/customers", customerRoutes);
 

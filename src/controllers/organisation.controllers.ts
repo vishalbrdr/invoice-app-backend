@@ -1,7 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler";
 import { Organisation } from "../models/organisation.model";
 import { OrganisationType } from "../middlewares/organisation.middleware";
-import { User } from "../models/user.model";
 import { Address } from "../models/address.model";
 import { BankAccInfo } from "../models/bankAccInfo";
 import { ApiResponse } from "../utils/ApiResponse";
@@ -51,7 +50,7 @@ export const getOrganisationData = asyncHandler(async (req, res) => {
   const organisation = await Organisation.findById(req.params.orgId);
   if (!organisation)
     throw new ApiError(400, "failed to fetch the organisation data");
-  
+
   res.json(
     new ApiResponse(200, organisation, "organisation data fetched sucessfully")
   );

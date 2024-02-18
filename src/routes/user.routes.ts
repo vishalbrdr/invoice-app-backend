@@ -4,6 +4,7 @@ import {
   changeCurrentPassword,
   getCurrentUser,
   loginUser,
+  logoutUser,
   refreshAccessToken,
   registerUser,
   updateAccountDetails,
@@ -16,11 +17,11 @@ router.route("/").get(isAuthenticated, getCurrentUser);
 
 router.route("/register").post(validateUserSchema, registerUser);
 router.route("/login").post(loginUser);
-router.route("/logout").get(loginUser);
+router.route("/logout").get(isAuthenticated, logoutUser);
 
 router.route("/update-user").patch(isAuthenticated, updateAccountDetails);
 router.route("/change-password").patch(isAuthenticated, changeCurrentPassword);
 
-router.route("/refesh-auth-token").get(refreshAccessToken)
+router.route("/refesh-auth-token").get(refreshAccessToken);
 
 export default router;
