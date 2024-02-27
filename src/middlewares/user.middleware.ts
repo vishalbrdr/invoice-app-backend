@@ -29,8 +29,9 @@ export const validateUserSchema = asyncHandler(
 
     const user = await User.findOne({ email });
     if (user) {
-      const error = "email already registred please login or use another email and try again";
-      return res.status(400).json(new ApiError(400, error, [error]));
+      const error =
+        "email already registred please login or use another email and try again";
+      throw new ApiError(400, error, [error]);
     }
 
     next();

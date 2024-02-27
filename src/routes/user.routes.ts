@@ -13,7 +13,7 @@ import { isAuthenticated } from "../middlewares/auth.middlewares";
 
 const router = Router();
 
-router.route("/").get(isAuthenticated, getCurrentUser);
+router.route("/me").get(isAuthenticated, getCurrentUser);
 
 router.route("/register").post(validateUserSchema, registerUser);
 router.route("/login").post(loginUser);
