@@ -187,7 +187,7 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
         )
       );
   } catch (error) {
-    return new ApiError(401, error?.message || "invalid refreshtoken");
+    throw new ApiError(401, error?.message || "invalid refreshtoken");
   }
 });
 

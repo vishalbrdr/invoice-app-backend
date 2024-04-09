@@ -15,7 +15,7 @@ app.use(express.json({ limit: "16kb" }));
 // app.use(express.static("public"));
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
+app.get("/", (_, res) => {
   const filePath = path.join(__dirname, "../README.md");
 
   fs.readFile(filePath, "utf8", (err, data) => {
@@ -36,6 +36,7 @@ import productRoutes from "./routes/product.routes";
 import customerRoutes from "./routes/customer.routes";
 import path from "path";
 import { marked } from "marked";
+
 // routes declaration
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/orgs", orgRouter);
