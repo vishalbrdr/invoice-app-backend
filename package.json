@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "start": "tsc && node dist/index.js",
+    "prestart": "tsc",
+    "start": "node dist/index.js",
     "dev": "nodemon src/index.ts"
   },
   "keywords": [],
@@ -18,8 +19,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.11.10",
     "nodemon": "^3.0.3",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "ts-node": "^10.9.2"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -30,6 +30,7 @@
     "jsonwebtoken": "^9.0.2",
     "marked": "^11.2.0",
     "mongoose": "^8.1.1",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "typescript": "^5.3.3"
   }
 }
