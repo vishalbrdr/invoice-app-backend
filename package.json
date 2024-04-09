@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "build": "esbuild src/index.ts --platform=node  --bundle --outfile=dist/app.js",
+    "build": "esbuild src/index.ts --platform=node  --bundle --outfile=dist/app.js --minify",
     "prestart": "npm run build",
     "start": "node dist/app.js",
     "dev": "nodemon src/index.ts"
